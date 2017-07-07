@@ -10,7 +10,9 @@ import Data.Proxy
 import Data.Typeable
 
 
+mydicts = $(someDicts ''Show)
+
 test :: [String]
-test = flip map $(someDicts ''What1)
+test = flip map mydicts
      $ withSomeDict1
-     $ \(p :: Proxy a) -> what1 @a
+     $ \(p :: Proxy a) -> "hello"

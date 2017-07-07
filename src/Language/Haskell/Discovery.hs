@@ -10,6 +10,7 @@
 
 module Language.Haskell.Discovery where
 
+import Data.Typeable
 import Data.Constraint
 import Language.Haskell.TH
 import Data.Maybe (mapMaybe)
@@ -112,25 +113,10 @@ withSomeDict8 :: (forall a b d e f g h i. c a b d e f g h i => Proxy (a, b, d, e
 withSomeDict8 f (SomeDict8 (d :: Dict (c a b d e f g h i))) =
   case d of Dict -> f $ Proxy @(a, b, d, e, f, g, h, i)
 
-
-
-
-
-
-class What1 a where
-  what1 :: String
-
-instance What1 Int where
-  what1 = "int"
-
-instance What1 Bool where
-  what1 = "bool"
-
-
 numTypeVars :: Type -> Int
 numTypeVars = subtract 1 . length . unapply
 
 unapply :: Type -> [Type]
-unapply (AppT a b) = a : unapply b
+unapply (AppT a b) = unapply a ++ [b]
 unapply a = [a]
 

@@ -6,11 +6,10 @@ module Test where
 
 import Data.Constraint
 import TH
+import Data.Proxy
 
 
 test :: [String]
 test = flip map $(dicts ''What)
      $ withSomeDict
-     $ \(d :: Dict (What a)) ->
-       case d of
-         Dict -> what @a
+     $ \(p :: Proxy a) -> what @a

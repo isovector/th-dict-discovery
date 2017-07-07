@@ -1,15 +1,19 @@
 {-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE TypeApplications      #-}
 
 module TH where
 
 import Data.Constraint
 import Language.Haskell.TH
 import Data.Maybe (mapMaybe)
+import Data.Proxy
 
 dicts :: Name -> Q Exp
 dicts name = do
@@ -30,8 +34,10 @@ getSomeDict = AppE (ConE 'SomeDict)
 data SomeDict c where
   SomeDict :: Dict (c a) -> SomeDict c
 
-withSomeDict :: (forall a. Dict (c a) -> r) -> SomeDict c -> r
-withSomeDict f (SomeDict d) = f d
+withSomeDict :: (forall a. c a => Proxy a -> r) -> SomeDict c -> r
+withSomeDict f (SomeDict (d :: Dict (c a))) =
+  case d of
+    Dict -> f $ Proxy @a
 
 class What a where
   what :: String

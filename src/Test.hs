@@ -10,6 +10,8 @@ import Data.Proxy
 
 
 test :: [String]
-test = flip map $(dicts ''What)
+test = flip map $(dicts ''What1)
      $ withSomeDict
-     $ \(p :: Proxy a) -> what @a
+     $ \(p :: Proxy a) -> what1 @a
+
+test2 = $(dicts ''What2)

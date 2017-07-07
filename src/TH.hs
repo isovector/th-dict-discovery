@@ -52,10 +52,40 @@ data SomeDict6 c where SomeDict6 :: Dict (c a b d e f g)     -> SomeDict6 c
 data SomeDict7 c where SomeDict7 :: Dict (c a b d e f g h)   -> SomeDict7 c
 data SomeDict8 c where SomeDict8 :: Dict (c a b d e f g h i) -> SomeDict8 c
 
-withSomeDict :: (forall a. c a => Proxy a -> r) -> SomeDict1 c -> r
-withSomeDict f (SomeDict1 (d :: Dict (c a))) =
-  case d of
-    Dict -> f $ Proxy @a
+withSomeDict1 :: (forall a. c a => Proxy a -> r) -> SomeDict1 c -> r
+withSomeDict1 f (SomeDict1 (d :: Dict (c a))) =
+  case d of Dict -> f $ Proxy @a
+
+withSomeDict2 :: (forall a b. c a b => Proxy (a, b) -> r) -> SomeDict2 c -> r
+withSomeDict2 f (SomeDict2 (d :: Dict (c a b))) =
+  case d of Dict -> f $ Proxy @(a, b)
+
+withSomeDict3 :: (forall a b d. c a b d => Proxy (a, b, d) -> r) -> SomeDict3 c -> r
+withSomeDict3 f (SomeDict3 (d :: Dict (c a b d))) =
+  case d of Dict -> f $ Proxy @(a, b, d)
+
+withSomeDict4 :: (forall a b d e. c a b d e => Proxy (a, b, d, e) -> r) -> SomeDict4 c -> r
+withSomeDict4 f (SomeDict4 (d :: Dict (c a b d e))) =
+  case d of Dict -> f $ Proxy @(a, b, d, e)
+
+withSomeDict5 :: (forall a b d e f. c a b d e f => Proxy (a, b, d, e, f) -> r) -> SomeDict5 c -> r
+withSomeDict5 f (SomeDict5 (d :: Dict (c a b d e f))) =
+  case d of Dict -> f $ Proxy @(a, b, d, e, f)
+
+withSomeDict6 :: (forall a b d e f g. c a b d e f g => Proxy (a, b, d, e, f, g) -> r) -> SomeDict6 c -> r
+withSomeDict6 f (SomeDict6 (d :: Dict (c a b d e f g))) =
+  case d of Dict -> f $ Proxy @(a, b, d, e, f, g)
+
+withSomeDict7 :: (forall a b d e f g h. c a b d e f g h => Proxy (a, b, d, e, f, g, h) -> r) -> SomeDict7 c -> r
+withSomeDict7 f (SomeDict7 (d :: Dict (c a b d e f g h))) =
+  case d of Dict -> f $ Proxy @(a, b, d, e, f, g, h)
+
+withSomeDict8 :: (forall a b d e f g h i. c a b d e f g h i => Proxy (a, b, d, e, f, g, h, i) -> r) -> SomeDict8 c -> r
+withSomeDict8 f (SomeDict8 (d :: Dict (c a b d e f g h i))) =
+  case d of Dict -> f $ Proxy @(a, b, d, e, f, g, h, i)
+
+
+
 
 class What1 a where
   what1 :: String
@@ -72,10 +102,11 @@ class What2 a b where
 instance What2 Int Bool where
   what2 = "int bool"
 
+
 numTypeVars :: Type -> Int
 numTypeVars = subtract 1 . length . unapply
 
 unapply :: Type -> [Type]
-unapply (AppT a b) = unapply a ++ unapply b
+unapply (AppT a b) = a : unapply b
 unapply a = [a]
 

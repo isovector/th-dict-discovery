@@ -7,11 +7,10 @@ module Test where
 import Data.Constraint
 import TH
 import Data.Proxy
+import Data.Typeable
 
 
 test :: [String]
 test = flip map $(dicts ''What1)
-     $ withSomeDict
+     $ withSomeDict1
      $ \(p :: Proxy a) -> what1 @a
-
-test2 = $(dicts ''What2)

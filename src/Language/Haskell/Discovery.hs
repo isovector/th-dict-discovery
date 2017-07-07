@@ -8,28 +8,34 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 
-module TH where
+module Language.Haskell.Discovery where
 
 import Data.Constraint
 import Language.Haskell.TH
 import Data.Maybe (mapMaybe)
 import Data.Proxy
 
-dicts :: Name -> Q Exp
+
+someDicts :: Name -> Q Exp
+someDicts = fmap fst . dicts
+
+dicts :: Name -> Q (Exp, Exp)
 dicts name = do
   reify name >>= \case
     ClassI _ insts ->
       let okInsts = mapMaybe isFine insts
           size = numTypeVars $ head okInsts
-       in pure . ListE . fmap (getSomeDict size . getDict) $ okInsts
+       in pure ( ListE . fmap (getSomeDict size . getDict) $ okInsts
+               , getWithDict size
+               )
     _ -> error "must be used on a class"
 
 isFine :: InstanceDec -> Maybe Type
 isFine (InstanceD _ [] t _) = Just t
-isFine _ = Nothing
+isFine _                    = Nothing
 
 getDict :: Type -> Exp
-getDict t = (ConE 'Dict `SigE` (ConT ''Dict `AppT` t))
+getDict t = ConE 'Dict `SigE` (ConT ''Dict `AppT` t)
 
 getSomeDict :: Int -> Exp -> Exp
 getSomeDict 0 = id
@@ -43,6 +49,19 @@ getSomeDict 7 = AppE (ConE 'SomeDict7)
 getSomeDict 8 = AppE (ConE 'SomeDict8)
 getSomeDict _ = error "too many type variables!"
 
+getWithDict :: Int -> Exp
+getWithDict 0 = error "to do"
+getWithDict 1 = VarE 'withSomeDict1
+getWithDict 2 = VarE 'withSomeDict2
+getWithDict 3 = VarE 'withSomeDict3
+getWithDict 4 = VarE 'withSomeDict4
+getWithDict 5 = VarE 'withSomeDict5
+getWithDict 6 = VarE 'withSomeDict6
+getWithDict 7 = VarE 'withSomeDict7
+getWithDict 8 = VarE 'withSomeDict8
+getWithDict _ = error "too many type variables!"
+
+-- TODO(sandy): It would be cool if we could generate these just in time.
 data SomeDict1 c where SomeDict1 :: Dict (c a)               -> SomeDict1 c
 data SomeDict2 c where SomeDict2 :: Dict (c a b)             -> SomeDict2 c
 data SomeDict3 c where SomeDict3 :: Dict (c a b d)           -> SomeDict3 c
@@ -51,6 +70,15 @@ data SomeDict5 c where SomeDict5 :: Dict (c a b d e f)       -> SomeDict5 c
 data SomeDict6 c where SomeDict6 :: Dict (c a b d e f g)     -> SomeDict6 c
 data SomeDict7 c where SomeDict7 :: Dict (c a b d e f g h)   -> SomeDict7 c
 data SomeDict8 c where SomeDict8 :: Dict (c a b d e f g h i) -> SomeDict8 c
+
+doIt :: Name -> Q Exp
+doIt name = do
+  (ds, with) <- dicts name
+  pure $ TupE [ds, with]
+
+-- test = flip map $(dicts ''What1)
+--      $ withSomeDict1
+--      $ \(p :: Proxy a) -> what1 @a
 
 withSomeDict1 :: (forall a. c a => Proxy a -> r) -> SomeDict1 c -> r
 withSomeDict1 f (SomeDict1 (d :: Dict (c a))) =
@@ -87,6 +115,8 @@ withSomeDict8 f (SomeDict8 (d :: Dict (c a b d e f g h i))) =
 
 
 
+
+
 class What1 a where
   what1 :: String
 
@@ -95,12 +125,6 @@ instance What1 Int where
 
 instance What1 Bool where
   what1 = "bool"
-
-class What2 a b where
-  what2 :: String
-
-instance What2 Int Bool where
-  what2 = "int bool"
 
 
 numTypeVars :: Type -> Int

@@ -1,5 +1,9 @@
 # th-dict-discovery
 
+[![Build Status](https://travis-ci.org/isovector/th-dict-discovery.svg?branch=master)](https://travis-ci.org/isovector/th-dict-discovery)
+
+## Overview
+
 `th-dict-discovery` is a library to get your hands on the in-scope, concrete
 instances of a class. The motivating use-case is to generate property tests to
 automatically prove new instances of a class follow the laws.

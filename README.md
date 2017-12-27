@@ -1,6 +1,8 @@
 # th-dict-discovery
 
-[![Build Status](https://travis-ci.org/isovector/th-dict-discovery.svg?branch=master)](https://travis-ci.org/isovector/th-dict-discovery)
+[![Build Status](https://travis-ci.org/isovector/th-dict-discovery.svg?branch=master)](https://travis-ci.org/isovector/th-dict-discovery) | [Hackage][hackage]
+
+[hackage]: https://hackage.haskell.org/package/th-dict-discovery
 
 ## Overview
 

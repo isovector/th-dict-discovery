@@ -9,15 +9,37 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 
-module Language.Haskell.Discovery where
+module Language.Haskell.Discovery
+  ( someDicts
+  , SomeDict1 (..)
+  , SomeDict2 (..)
+  , SomeDict3 (..)
+  , SomeDict4 (..)
+  , SomeDict5 (..)
+  , SomeDict6 (..)
+  , SomeDict7 (..)
+  , SomeDict8 (..)
+  , withSomeDict1
+  , withSomeDict2
+  , withSomeDict3
+  , withSomeDict4
+  , withSomeDict5
+  , withSomeDict6
+  , withSomeDict7
+  , withSomeDict8
+  , Proxy (..)
+  , module Data.Constraint
+  ) where
 
-import Data.Typeable
 import Data.Constraint
-import Language.Haskell.TH
 import Data.Maybe (mapMaybe)
-import Data.Proxy
+import Data.Typeable
+import Language.Haskell.TH
 
 
+------------------------------------------------------------------------------
+-- | TemplateHaskell splice that will expand to a list of existentialized
+-- 'SomeDictN's for the given 'Name'.
 someDicts :: Name -> Q Exp
 someDicts = fmap fst . dicts
 
@@ -72,11 +94,6 @@ data SomeDict5 c where SomeDict5 :: Dict (c a b d e f)       -> SomeDict5 c
 data SomeDict6 c where SomeDict6 :: Dict (c a b d e f g)     -> SomeDict6 c
 data SomeDict7 c where SomeDict7 :: Dict (c a b d e f g h)   -> SomeDict7 c
 data SomeDict8 c where SomeDict8 :: Dict (c a b d e f g h i) -> SomeDict8 c
-
-doIt :: Name -> Q Exp
-doIt name = do
-  (ds, with) <- dicts name
-  pure $ TupE [ds, with]
 
 -- test = flip map $(dicts ''What1)
 --      $ withSomeDict1
